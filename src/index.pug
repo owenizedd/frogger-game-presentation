@@ -1,0 +1,129 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1')
+    title Frogger
+
+    link(rel='stylesheet', type='text/css', href='build/build.css')
+
+  body
+
+    article.deck
+      .window-container
+        .window-bar
+          span.circle1
+          span.circle2
+          span.circle3
+          span.title-app Nama Kelompok
+        .window-frame
+          
+          section
+            h1 Game Frogger
+
+          section
+            h2 Images
+            img(src="images/bespoke-logo.jpg")
+
+          section
+            h2 Keyboard Interaction
+            h3 Powered by <a href="https://github.com/bespokejs/bespoke-keys">bespoke-keys</a>
+
+          section
+            h2 Touch Interaction
+            h3 Powered by <a href="https://github.com/bespokejs/bespoke-touch">bespoke-touch</a>
+
+          section
+            h2 Responsive Slides
+            h3 Powered by <a href="https://github.com/bespokejs/bespoke-scale">bespoke-scale</a>
+            ul.build.build-items
+              li null
+          section
+            h2 Bullet List
+            h3 Powered by <a href="https://github.com/bespokejs/bespoke-bullets">bespoke-bullets</a>
+            ul.build.build-items
+              li Bullet 1
+              li Bullet 2
+              li Bullet 3
+              li Bullet 4
+
+          section
+            h2 Syntax Highlighting
+            h3 Powered by <a href="https://twitter.com/LeaVerou">Lea Verou</a>'s <a href="https://github.com/PrismJS/prism">Prism</a>
+            pre
+              code.language-javascript.
+                (function() {
+                  function hanoi(n, a, b, c) {
+                    return n ? hanoi(n - 1, a, c, b)
+                        .concat([[a, b]])
+                        .concat(hanoi(n - 1, c, b, a)) : [];
+                  }
+                  return hanoi(3, 'left', 'right', 'mid')
+                    .map(function(d) {
+                      return d[0] + ' -&gt; ' + d[1];
+                    });
+                })();
+
+          section(data-bespoke-hash='named-route')
+            h2 Named Route
+            h3 Powered by <a href="https://github.com/bespokejs/bespoke-hash">bespoke-hash</a>
+            p Look up! This route has been named with a <em>data-bespoke-hash</em> attribute.
+          section
+            h2.bullet Just the beginning…
+            ul.build.build-items
+              li Edit <a href="https://pugjs.org">Pug (formerly Jade)</a> markup in <em class="path">src/index.pug</em>
+              li Edit <a href="http://stylus-lang.com">Stylus</a> styles in <em class="path">src/styles/user.styl</em>
+              li Edit JavaScript in <em class="path">src/scripts/main.js</em>
+            br
+            ul.build
+              li
+                strong Enjoy! :)
+                a(href='https://twitter.com/markdalgleish')  -@markdalgleish
+
+    script(src='build/build.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js')
+    script.
+      dragElement(document.getElementsByClassName("window-container")[0]);
+
+      function dragElement(elmnt) {
+        var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        if (document.getElementsByClassName('window-bar')[0]) {
+          // if present, the header is where you move the DIV from:
+          document.getElementsByClassName('window-bar')[0].onmousedown = dragMouseDown;
+        } else {
+          // otherwise, move the DIV from anywhere inside the DIV:
+          elmnt.onmousedown = dragMouseDown;
+        }
+
+        function dragMouseDown(e) {
+          e = e || window.event;
+          e.preventDefault();
+          pos3 = e.clientX;
+          pos4 = e.clientY;
+          document.onmouseup = closeDragElement;
+          document.onmousemove = elementDrag;
+        }
+
+        function elementDrag(e) {
+          e = e || window.event;
+          e.preventDefault();
+          // calculate the new cursor position:
+          pos1 = pos3 - e.clientX;
+          pos2 = pos4 - e.clientY;
+          pos3 = e.clientX;
+          pos4 = e.clientY;
+          // set the element's new position:
+          elmnt.style.position = 'relative';
+          
+          //- elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+          // untuk perbaiki bug posisi ketika drag
+          document.getElementsByClassName('window-bar')[0].style.top = '24px'
+          elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        }
+
+        function closeDragElement() {
+          // stop moving when mouse button is released:
+          document.onmouseup = null;
+          document.onmousemove = null;
+        }
+      }

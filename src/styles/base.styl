@@ -1,0 +1,175 @@
+// Base styles for a Bespoke presentation
+
+*, ::before, ::after
+  box-sizing inherit
+
+html
+  box-sizing border-box
+
+p, li
+  line-height 1.6
+
+p
+  margin 0 0 1rem 0
+
+ul, ol
+  padding 0 0 0 20px
+
+figure
+  margin 0
+
+img, video
+  vertical-align middle
+
+.deck
+  overflow hidden
+  font-feature-settings "kern" 1
+  text-rendering optimizeLegibility
+  -webkit-font-smoothing antialiased
+  -moz-osx-font-smoothing grayscale
+  // NOTE hide deck and slide content until Bespoke.js classes have been added
+  &:not(.bespoke-parent), section:not(.bespoke-slide)
+    display none
+
+.bespoke-parent, .bespoke-scale-parent
+  position absolute
+  top 0
+  right 0
+  bottom 0
+  left 0
+
+.bespoke-scale-parent, .bespoke-slide
+  pointer-events none
+
+.bespoke-slide
+  overflow hidden
+  // NOTE force opacity to start at 0 to avoid transition on load when using bespoke-scale
+  opacity 0
+  background-color #fff
+  position absolute
+  top 50%
+  left 150%
+  width 640px
+  margin-left -(@width / 2)
+  height 480px
+  margin-top -(@height / 2)
+  display flex
+  flex-direction column
+  align-items center
+  justify-content center
+  transition all 500ms ease-in-out 150ms
+  
+.bespoke-active
+  pointer-events auto
+  opacity 1
+  // NOTE Webkit requires z-index to be 1 for elements to receive focus (may no longer apply)
+  z-index 1
+  left 50%
+.bespoke-inactive
+  transition-delay 0
+.bespoke-before
+  left -50% !important
+.bespoke-after
+  left 150% !important
+.bespoke-bullet
+  transition opacity 200ms ease-in-out
+  &-inactive
+    visibility hidden
+
+.emphatic
+  background-color #222
+
+.emphatic-text
+  color #fff
+
+aside[role=note], aside[role=notes]
+  display none
+article
+  background linear-gradient(#141E30, #243B55) !important
+  align-items center !important 
+section
+  background rgba(0,0,0,.3) !important
+  height 600px !important
+  width 750px !important
+  position: relative !important
+  top: 220px !important
+  left: 335px !important
+  color whitesmoke !important
+section a
+  color lightblue !important
+.window-frame
+  width 800px
+  height 600px
+  position relative
+  top 10%
+  left 23%
+  overflow hidden
+  box-sizing border-box !important
+  padding 20px
+  padding-top 50px
+  border 5px solid rgba(0,0,0,.6)
+
+
+.window-bar
+  width 800px
+  height 36px
+  position absolute
+  top: 5%
+  left: 23%
+  background rgba(0,0,0,.6)
+.circle1
+  background #FF5F57
+  width 15px
+  height 15px
+  position absolute
+  z-index 1000
+  top 12px
+  left 10px
+  border-radius 10px
+.circle2
+  background #FBB80B
+  width 15px
+  height 15px
+  position absolute
+  z-index 1000
+  top 12px
+  left 35px
+  border-radius 15px
+.circle3
+  background #4DC553
+  width 15px
+  height 15px
+  position absolute
+  z-index 1000
+  top 12px
+  left 60px
+  border-radius 15px
+
+.title-app
+  color whitesmoke
+  position relative
+  left 50% - 10px
+  top 50% - 20px
+.window-bar:hover
+  cursor move
+.window-container
+  height 600px
+  margin-top 13px
+  animation-name zoomIn
+  animation-duration 1000ms
+  animation-delay 0ms
+  animation-direction normal
+  animation-iteration-count 1
+  animation-timing-function ease-in-out
+  
+@keyframes zoomIn{
+  0%{
+    transform: scale(0)
+  }
+  70%{
+    transform: scale(1.2)
+  }
+  100%{
+    transform: scale(1)
+  }
+}
