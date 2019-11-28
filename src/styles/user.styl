@@ -13,3 +13,42 @@
   transition 500ms all
 .bespoke-bullet-current
   text-shadow 1px 2px 20px rgb(159,106,181)
+
+img.show-text + span
+  text-shadow 1px 2px 20px rgb(159,106,181)
+  margin-bottom: 0px
+  opacity: 0
+  visibility: none
+  transition: 300ms all
+  font-weight: bold
+  text-decoration: underline
+img.show-text:hover + span
+  margin-bottom: 10px
+  opacity: 1
+  visibility: visible
+  transition: 300ms all
+
+.bespoke-active > div h1.animate-text-in
+  animation: fadeIn
+  animation-duration: 1.5s
+  animation-direction: normal
+  animation-fill-mode: forwards
+  position: relative
+  animation-delay: 1s
+  top: 50px
+.bespoke-active div:last-child h1.animate-text-in
+  animation-delay: 1.3s !important
+.animate-text-container
+  width: 100%
+  height: 60px
+  overflow: hidden
+  text-align: center
+@keyframes fadeIn{
+  from{
+    top: 50px
+
+  }
+  to{
+    top: 0px
+  }
+}

@@ -33,61 +33,19 @@ html
               li Kehadiran Frogger dipandang positif dan diikuti beberapa tiruan dan sekuel. Pada tahun 2005, Frogger dan berbagai bentuk frogger terjual 20 juta salinan diseluruh dunia, dan 5 juta di Amerika Serikat (United States). Kemudian game ini semakin dikenal dalam media media yang populer, seperti televisi dan musik.
           section
             h2 Aturan Main Game
-            img(src="https://upload.wikimedia.org/wikipedia/en/c/cd/Frogger_game_arcade.png" height="200px")
+            img(src="https://upload.wikimedia.org/wikipedia/en/c/cd/Frogger_game_arcade.png" height="200px" class="show-text")
+            span Screenshot game Frogger
             p Pada game ini kita sebagai katak harus bergerak melewati rintangan untuk mencapai rumah dari katak dari 2 jenis rintangan utama, yaitu jalanan dan sungai. 
             | Pada jalanan kita harus menghindari mobil atau bus, sedangkan pada sungai kita harus menyeberangi dengan melompati balok kayu yang sedang melintas di sungai.
-            
-
+          
           section
-            h2 Touch Interaction
-            h3 Powered by <a href="https://github.com/bespokejs/bespoke-touch">bespoke-touch</a>
-
-          section
-            h2 Responsive Slides
-            h3 Powered by <a href="https://github.com/bespokejs/bespoke-scale">bespoke-scale</a>
-            ul.build.build-items
-              li null
-          section
-            h2 Bullet List
-            h3 Powered by <a href="https://github.com/bespokejs/bespoke-bullets">bespoke-bullets</a>
-            ul.build.build-items
-              li Bullet 1
-              li Bullet 2
-              li Bullet 3
-              li Bullet 4
-
-          section
-            h2 Syntax Highlighting
-            h3 Powered by <a href="https://twitter.com/LeaVerou">Lea Verou</a>'s <a href="https://github.com/PrismJS/prism">Prism</a>
-            pre
-              code.language-javascript.
-                (function() {
-                  function hanoi(n, a, b, c) {
-                    return n ? hanoi(n - 1, a, c, b)
-                        .concat([[a, b]])
-                        .concat(hanoi(n - 1, c, b, a)) : [];
-                  }
-                  return hanoi(3, 'left', 'right', 'mid')
-                    .map(function(d) {
-                      return d[0] + ' -&gt; ' + d[1];
-                    });
-                })();
-
-          section(data-bespoke-hash='named-route')
-            h2 Named Route
-            h3 Powered by <a href="https://github.com/bespokejs/bespoke-hash">bespoke-hash</a>
-            p Look up! This route has been named with a <em>data-bespoke-hash</em> attribute.
-          section
-            h2.bullet Just the beginning…
-            ul.build.build-items
-              li Edit <a href="https://pugjs.org">Pug (formerly Jade)</a> markup in <em class="path">src/index.pug</em>
-              li Edit <a href="http://stylus-lang.com">Stylus</a> styles in <em class="path">src/styles/user.styl</em>
-              li Edit JavaScript in <em class="path">src/scripts/main.js</em>
-            br
-            ul.build
-              li
-                strong Enjoy! :)
-                a(href='https://twitter.com/markdalgleish')  -@markdalgleish
+            h2 Game Frogger
+          
+          section 
+            div.animate-text-container
+              h1.animate-text-in Terima kasih
+            div.animate-text-container
+              h1.animate-text-in atas perhatianya :)
 
     script(src='build/build.js')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js')
