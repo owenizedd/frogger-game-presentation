@@ -26,8 +26,19 @@ var pkg = require('./package.json'),
     this.emit('end');
   };
 
+gulp.task('frogger', ['clean:frogger'], function(){
+  return browserify('src/scripts/frogger.js').bundle()
+    .on('error', browserifyPlumber)
+    .pipe(source('src/scripts/frogger.js'))
+    .pipe(buffer())
+    .pipe(isDist ? uglify() : through())
+    .pipe(rename('frogger.js'))
+    .pipe(gulp.dest('dist/build'))
+    .pipe(connect.reload());
+})
 gulp.task('js', ['clean:js'], function() {
   // see https://wehavefaces.net/gulp-browserify-the-gulp-y-way-bb359b3f9623
+
   return browserify('src/scripts/main.js').bundle()
     .on('error', browserifyPlumber)
     .pipe(source('src/scripts/main.js'))
@@ -81,7 +92,9 @@ gulp.task('clean:html', function() {
 gulp.task('clean:js', function() {
   return del('dist/build/build.js');
 });
-
+gulp.task('clean:frogger', function(){
+  return del('dist/build/frogger.js');
+})
 gulp.task('clean:css', function() {
   return del('dist/build/build.css');
 });
@@ -100,7 +113,7 @@ gulp.task('connect', ['build'], function() {
 
 gulp.task('watch', function() {
   gulp.watch('src/**/*.pug', ['html']);
-  gulp.watch('src/scripts/**/*.js', ['js']);
+  gulp.watch('src/scripts/**/*.js', ['js', 'frogger']);
   gulp.watch('src/styles/**/*.styl', ['css']);
   gulp.watch('src/images/**/*', ['images']);
   gulp.watch('src/fonts/*', ['fonts']);
@@ -113,7 +126,7 @@ gulp.task('publish', ['clean', 'build'], function(done) {
 // old alias for publishing on gh-pages
 gulp.task('deploy', ['publish']);
 
-gulp.task('build', ['js', 'html', 'css', 'images', 'fonts']);
+gulp.task('build', ['js', 'html', 'css', 'images', 'fonts', 'frogger']);
 
 gulp.task('serve', ['connect', 'watch']);
 

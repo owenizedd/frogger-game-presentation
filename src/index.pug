@@ -38,8 +38,9 @@ html
             p Pada game ini kita sebagai katak harus bergerak melewati rintangan untuk mencapai rumah dari katak dari 2 jenis rintangan utama, yaitu jalanan dan sungai. 
             | Pada jalanan kita harus menghindari mobil atau bus, sedangkan pada sungai kita harus menyeberangi dengan melompati balok kayu yang sedang melintas di sungai.
           
-          section
-            h2 Game Frogger
+          section.relativess
+            canvas(id="background-canvas" class="canvas" width="640" height="480")
+            canvas(id="canvas" class="canvas" width="640" height="480")
           
           section 
             div.animate-text-container
@@ -49,6 +50,7 @@ html
 
     script(src='build/build.js')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js')
+
     script.
       dragElement(document.getElementsByClassName("window-container")[0]);
 
