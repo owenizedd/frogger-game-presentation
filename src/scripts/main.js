@@ -9,7 +9,7 @@ var prism = require('bespoke-prism');
 var extern = require('bespoke-extern');
 
 // Bespoke.js
-bespoke.from({ parent: 'article.deck', slides: 'section' }, [
+var deck = bespoke.from({ parent: 'article.deck', slides: 'section' }, [
   classes(),
   nav(),
   scale('transform'),
@@ -18,4 +18,16 @@ bespoke.from({ parent: 'article.deck', slides: 'section' }, [
   prism(),
   extern(bespoke)
 ]);
+
+
+deck.on('activate', function(evt){
+  let currentSlideIndex = evt.index;
+  console.info(currentSlideIndex)
+  if (currentSlideIndex === 4){
+    document.getElementsByClassName('background-end')[0].style='opacity: 1'
+  }
+  else{
+    document.getElementsByClassName('background-end')[0].style='opacity: 0'
+  }
+})
 

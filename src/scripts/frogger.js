@@ -1143,3 +1143,5 @@ Frogger.ImageSprite.prototype = {
     // initialize() function
     Frogger.observer.subscribe("game-board-initialize", initialize);
 }(Frogger));
+
+

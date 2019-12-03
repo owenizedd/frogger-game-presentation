@@ -28,7 +28,7 @@ img.show-text:hover + span
   visibility: visible
   transition: 300ms all
 
-.bespoke-active > div h1.animate-text-in
+.bespoke-active div h1.animate-text-in
   animation: fadeIn
   animation-duration: 1.5s
   animation-direction: normal
@@ -36,8 +36,7 @@ img.show-text:hover + span
   position: relative
   animation-delay: 1s
   top: 50px
-.bespoke-active div:last-child h1.animate-text-in
-  animation-delay: 1.3s !important
+
 .animate-text-container
   width: 100%
   height: 60px
@@ -75,3 +74,11 @@ img.show-text:hover + span
   width: 640px;
   margin-top: 10%;
   margin-left: 8%;
+.background-end
+  background: linear-gradient(315deg, #63d471 0%, #233329 80%) !important;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  z-index: 0;
+  opacity: 0;
+  transition: 2000ms all;

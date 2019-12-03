@@ -8,14 +8,16 @@ html
     link(rel='stylesheet', type='text/css', href='build/build.css')
 
   body
-
+    
     article.deck
+      .background-end
+
       .window-container
         .window-bar
           span.circle1
           span.circle2
           span.circle3
-          span.title-app Tim TST (Tiga Setengah Tahun)
+          span.title-app Frogger - Tim TST (Tiga Setengah Tahun)
         .window-frame
           
           section
@@ -46,9 +48,11 @@ html
             div.animate-text-container
               h1.animate-text-in Terima kasih
             div.animate-text-container
-              h1.animate-text-in atas perhatianya :)
+              h1.animate-text-in(style="animation-delay: 1.5s") atas perhatianya :)
+            .bg-green
 
     script(src='build/build.js')
+    
     script(src="build/frogger.js")
     script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js')
 
