@@ -1711,13 +1711,15 @@ Frogger.Character = (function(Frogger) {
     window.addEventListener("keydown", function(event) {
 
         // Define the key codes for the arrow keys
-        var LEFT_ARROW = 37,
-            UP_ARROW = 38,
-            RIGHT_ARROW = 39,
-            DOWN_ARROW = 40;
+        //menggunakan AWSD
+        var LEFT_ARROW = 65,
+            UP_ARROW = 87,
+            RIGHT_ARROW = 68,
+            DOWN_ARROW = 83;
 
         // Execute the move() function, passing along the correct direction based on the
         // arrow key pressed. Ignore any other key presses
+        console.log(event.keyCode)
         if (event.keyCode === LEFT_ARROW) {
             move(Frogger.direction.LEFT);
         } else if (event.keyCode === RIGHT_ARROW) {
