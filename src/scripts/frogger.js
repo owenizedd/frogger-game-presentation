@@ -1762,3 +1762,417 @@ Frogger.Character = (function(Frogger) {
         setPosition: setPosition
     };
 }(Frogger));
+
+// Froggor.Row untuk module mendefinisikan type dari obstacles yang ada, log, vehicles, obstacles, and a goal row
+// goal row containing the locations of players character aims to reach to win the game.
+
+Frogger.Row = (function() {
+
+    // Define a base row "class" containing the shared code required for each different
+    // type of specialist row on the game board
+    function Row(options) {
+        options = options || {};
+
+        // Define the direction of obstacles moving on this row, defaults to moving left
+        this.direction = options.direction || Frogger.direction.LEFT;
+
+        // Define the set of obstacles to place on this row and move
+        this.obstacles = options.obstacles || [];
+
+        // Define the top position, in pixels, of where this row sits on the game board
+        this.top = options.top || 0;
+
+        // Define the speed with which obstacles on this row move in the given direction
+        // as a factor of the render rate set in game loop
+        this.speed = options.speed || 1;
+    }
+
+    Row.prototype = {
+
+        // Define a method to render each of the obstacles in the correct place on the
+        // current row
+        render: function() {
+            var index = 0,
+                length = this.obstacles.length,
+                left,
+                obstaclesItem;
+
+            // Loop through each of the obstacles within this row
+            for (; index < length; index++) {
+                obstaclesItem = this.obstacles[index];
+
+                // Update the left position, in pixels, of this obstacle based on its
+                // current position along with the direction and speed of movement
+                left = obstaclesItem.getPosition().left + ((this.direction === Frogger.direction.RIGHT ? 1 : -1) * this.speed);
+
+                // Adjust the left position such that if the obstacle falls off one edge of
+                // the game board, it then appears to return from the other edge
+                if (left < -obstaclesItem.getWidth()) {
+                    left = Frogger.drawingSurfaceWidth;
+                } else if (left >= Frogger.drawingSurfaceWidth) {
+                    left = -obstaclesItem.getWidth();
+                }
+
+                // Move the obstacle and draw it on the game board in the updated position
+                obstaclesItem.moveTo(left);
+                obstaclesItem.renderAt(left, this.top);
+            }
+        },
+
+        // Define a method to return the top position, in pixels, of this row
+        getTop: function() {
+            return this.top;
+        },
+
+        // Define a method to detect whether the player's character is currently colliding
+        // with an obstacle on this row
+        isCollision: function(characterPosition) {
+            var index = 0,
+                length = this.obstacles.length,
+                obstaclesItem,
+                isCollision = false;
+
+            // Loop through each of the obstacles on this row
+            for (; index < length; index++) {
+                obstaclesItem = this.obstacles[index];
+
+                // If the player's character touches the current obstacle, a collision
+                // has taken place and we return this fact to the calling code
+                if (Frogger.intersects(obstaclesItem.getPosition(), characterPosition)) {
+                    isCollision = true;
+                }
+            }
+
+            return isCollision;
+        },
+
+        // Define a method to reset the obstacles on this row to their default state and
+        // position on the game board
+        reset: function() {
+            var index = 0,
+                length = this.obstacles.length;
+
+            // Loop through each of the obstacles within this row, and call their reset()
+            // methods in turn
+            for (; index < length; index++) {
+                this.obstacles[index].reset();
+            }
+        }
+    };
+
+    // Define a new "class" representing a road-type row, containing vehicle obstacles which
+    // inherits from our base Row "class"
+    function Road(options) {
+        Row.call(this, options);
+    }
+
+    Road.prototype = new Row();
+    Road.prototype.constructor = Road;
+
+    // Define a new "class" representing a row containing logs floating on water which
+    // inherits from our base Row "class"
+    function Log(options) {
+        Row.call(this, options);
+    }
+
+    Log.prototype = new Row();
+    Log.prototype.constructor = Log;
+
+    // Override the isCollision() method, reversing its behavior. If the player's character
+    // touches a log it is safe, however it should be considered a collision if it touches
+    // the water beneath rather than the obstacle itself
+    Log.prototype.isCollision = function(characterPosition) {
+
+        // Return the opposite Boolean state returned by a normal call to the isCollision()
+        // method
+        return !Row.prototype.isCollision.call(this, characterPosition);
+    };
+
+    // Override the render() method so that when the player's character lands on a log,
+    // it gets transported along the water with the log
+    Log.prototype.render = function() {
+
+        // If the player's character is on this row, update its position based on the
+        // direction and speed of motion of the log the player has landed on
+        if (Frogger.Character.getTop() === this.getTop()) {
+            Frogger.Character.setPosition(Frogger.Character.getPosition().left + ((this.direction === Frogger.direction.RIGHT ? 1 : -1) * this.speed));
+        }
+
+        // Call the inherited render() method to draw the log in its new position
+        Row.prototype.render.call(this);
+
+    };
+
+    // Define a new "class" representing a row containing turtles swimming in the water
+    // which inherits from our Log "class" as it shares similarities
+    function Turtle(options) {
+        Log.call(this, options);
+    }
+
+    Turtle.prototype = new Log();
+    Turtle.prototype.constructor = Turtle;
+
+    // Override the isCollision() method such that it behaves like the same method on
+    // the Log "class" apart from when the turtle obstacle has dipped underwater, in which
+    // case there will always be a collision if the player's character is on this row
+    Turtle.prototype.isCollision = function(characterPosition) {
+        var isCollision = Log.prototype.isCollision.call(this, characterPosition);
+        return this.obstacles[0].isUnderwater() || isCollision;
+    };
+
+    // Define a new "class" representing the goal row the player's character is aiming for
+    // in order to win the game, which inherits from our base Row "class"
+    function Goal(options) {
+
+        // The goals placed within this row never move so we always force the speed
+        // property to be 0
+        options.speed = 0;
+
+        Row.call(this, options);
+    }
+
+    Goal.prototype = new Row();
+    Goal.prototype.constructor = Goal;
+
+    // Override the isCollision() method to detect if the player's character has reached
+    // one of the available goals stored in this row
+    Goal.prototype.isCollision = function(characterPosition) {
+        var index = 0,
+            length = this.obstacles.length,
+            obstaclesItem,
+            isCollision = true;
+
+        // Loop through the goals in this row to find out if the player has reached one
+        // of them
+        for (; index < length; index++) {
+            obstaclesItem = this.obstacles[index];
+            // Skip the goal frogs appended to the row
+            if (! ('isMet' in obstaclesItem)) break;
+
+            // If this goal has not been reached before and the player's character is
+            // positioned above the goal, fire the "player-at-goal" event so the game logic
+            // module registers that the goal has been reached
+            if (Frogger.intersects(obstaclesItem.getPosition(), characterPosition)) {
+                if (!obstaclesItem.isMet) {
+                    this.obstacles[index].isMet = true;
+                    Frogger.observer.publish("player-at-goal");
+                    isCollision = false;
+
+                    // Add the image of the goal-reached frog to the row within the goal
+                    // reached so the user can see that they have reached this goal before
+                    this.obstacles.push(new Frogger.Image.GoalFrog(obstaclesItem.getPosition().left));
+                }
+                break;
+            }
+        }
+
+        return isCollision;
+    };
+
+    // Return the "classes" defined in this code module for use in the rest of our code
+    return {
+        Road: Road,
+        Log: Log,
+        Turtle: Turtle,
+        Goal: Goal
+    };
+}(Frogger));
+
+// Define a code module to add rows containing obstacles to the game board for the player
+// to avoid or make contact with in order to progress from the bottom to the top of the
+// game board in order to win the game by reaching each of the five goals without losing
+// all their lives or the allocated time running out
+(function(Frogger) {
+
+    // Define variables to store the populated rows on the game board, and the properties
+    // and settings of the game board itself
+    var _rows = [],
+        _gameBoard = {};
+
+    // Define a function to be called when the game board has initialized onto which we
+    // place our rows and obstacles
+    function initialize(gameBoard) {
+        _gameBoard = gameBoard;
+
+        // Add elevent rows of obstacles to the game board
+        _rows = [
+
+            // Add a goal row to the 3rd row on the game board (the rows start from index
+            // 0), containing five goals positioned in the respective places according to
+            // the designation on the game board background image
+            new Frogger.Row.Goal({
+                top: _gameBoard.rows[2],
+                obstacles: [new Frogger.Image.Goal(33, 111), new Frogger.Image.Goal(237, 315), new Frogger.Image.Goal(441, 519), new Frogger.Image.Goal(645, 723), new Frogger.Image.Goal(849, 927)]
+            }),
+
+            // Add a row of medium-length logs to the 4th row on the game board, moving
+            // right at a rate of 5 pixels per each time the game loop is called to
+            // render this row within the <canvas>
+            new Frogger.Row.Log({
+                top: _gameBoard.rows[3],
+                direction: Frogger.direction.RIGHT,
+                speed: 5,
+
+                // Add three medium-sized log obstacles to the game board, spaced out evenly
+                obstacles: [new Frogger.Image.MediumLog(_gameBoard.columns[1]), new Frogger.Image.MediumLog(_gameBoard.columns[6]), new Frogger.Image.MediumLog(_gameBoard.columns[10])]
+            }),
+
+            // Add a row of turtles, grouped in twos, on the 5th row of the game board,
+            // moving left (the default direction) at a rate of 6 pixels on each turn of the
+            // game loop
+            new Frogger.Row.Turtle({
+                top: _gameBoard.rows[4],
+                speed: 6,
+
+                // Add four obstacles spaced out across the width of the game board
+                obstacles: [new Frogger.Image.TwoTurtles(_gameBoard.columns[0]), new Frogger.Image.TwoTurtles(_gameBoard.columns[3]), new Frogger.Image.TwoTurtles(_gameBoard.columns[6]), new Frogger.Image.TwoTurtles(_gameBoard.columns[9])]
+            }),
+
+            // Add a row of long-length logs to the 6th row on the game board, moving right
+            // at a rate of 7 pixels on each turn of the game loop
+            new Frogger.Row.Log({
+                top: _gameBoard.rows[5],
+                direction: Frogger.direction.RIGHT,
+                speed: 7,
+
+                // Add two long-length log obstacles to this row
+                obstacles: [new Frogger.Image.LongLog(_gameBoard.columns[1]), new Frogger.Image.LongLog(_gameBoard.columns[10])]
+            }),
+
+            // Add a row of short-length logs to the 7th row of the game board, moving right
+            // at a rate of 3 pixels each time the game loop is called
+            new Frogger.Row.Log({
+                top: _gameBoard.rows[6],
+                direction: Frogger.direction.RIGHT,
+                speed: 3,
+
+                // Add three short-length logs to this row
+                obstacles: [new Frogger.Image.ShortLog(_gameBoard.columns[1]), new Frogger.Image.ShortLog(_gameBoard.columns[6]), new Frogger.Image.ShortLog(_gameBoard.columns[10])]
+            }),
+
+            // Add a row of turtles, grouped in threes, on the 8th row of the game board,
+            // moving left at a rate of 5 pixels each time the game loop is called
+            new Frogger.Row.Turtle({
+                top: _gameBoard.rows[7],
+                speed: 5,
+                obstacles: [new Frogger.Image.ThreeTurtles(_gameBoard.columns[0]), new Frogger.Image.ThreeTurtles(_gameBoard.columns[3]), new Frogger.Image.ThreeTurtles(_gameBoard.columns[7]), new Frogger.Image.ThreeTurtles(_gameBoard.columns[10])]
+            }),
+
+            // Add a set of truck-style vehicle obstacles to the 10th row of the game
+            // board (the 9th row is considered a "safe" row that contains no obstacles)
+            new Frogger.Row.Road({
+                top: _gameBoard.rows[9],
+                speed: 3,
+                obstacles: [new Frogger.Image.Truck(_gameBoard.columns[1]), new Frogger.Image.Truck(_gameBoard.columns[7])]
+            }),
+
+            // Add a set of turbo race car obstacles to the 11th row of the game board,
+            // moving right at a fast rate
+            new Frogger.Row.Road({
+                top: _gameBoard.rows[10],
+                direction: Frogger.direction.RIGHT,
+                speed: 12,
+                obstacles: [new Frogger.Image.TurboRaceCar(_gameBoard.columns[1]), new Frogger.Image.TurboRaceCar(_gameBoard.columns[7])]
+            }),
+
+            // Add a set of simple road car obstacles to the 12th row of the game board
+            new Frogger.Row.Road({
+                top: _gameBoard.rows[11],
+                speed: 4,
+                obstacles: [new Frogger.Image.RoadCar(_gameBoard.columns[1]), new Frogger.Image.RoadCar(_gameBoard.columns[7])]
+            }),
+
+            // Add a set of bulldozer-style obstacles to the 13th row of the game board
+            new Frogger.Row.Road({
+                top: _gameBoard.rows[12],
+                direction: Frogger.direction.RIGHT,
+                speed: 3,
+                obstacles: [new Frogger.Image.Bulldozer(_gameBoard.columns[1]), new Frogger.Image.Bulldozer(_gameBoard.columns[7])]
+            }),
+
+            // Add a set of race car obstacles to the 14th row of the game board, which is
+            // one row above where the player's character's starting position is
+            new Frogger.Row.Road({
+                top: _gameBoard.rows[13],
+                speed: 4,
+                obstacles: [new Frogger.Image.RaceCar(_gameBoard.columns[2]), new Frogger.Image.RaceCar(_gameBoard.columns[6])]
+            })
+        ];
+
+        // With the rows and obstacles initialized, connect the local render() function to
+        // the "render-base-layer" event fired from within the game loop to draw those
+        // obstacles onto the game board
+        Frogger.observer.subscribe("render-base-layer", render);
+    }
+
+    // Define a function to render each of the defined rows of obstacles onto the game board
+    function render() {
+        var row,
+            index = 0,
+            length = _rows.length;
+
+        // Loop through each row calling its render() method, which in turn calls the
+        // render() method of each of the obstacles stored within it
+        for (; index < length; index++) {
+            row = _rows[index];
+            row.render();
+        }
+    }
+
+    // Define a function to detect whether a collision has occured between the player's
+    // character and the obstacles within each row
+    function isCollision() {
+        var collided = false,
+            row,
+            index = 0,
+            length = _rows.length;
+
+        // Loop through each row calling its isCollision() method, which determines
+        // whether the obstacles on that row come into contact with the player's
+        // character on the game board
+        for (; index < length; index++) {
+            row = _rows[index];
+
+            if (Frogger.Character.getTop() === row.getTop()) {
+                collided = row.isCollision(Frogger.Character.getPosition());
+                if (collided) {
+                    break;
+                }
+            }
+        }
+
+        // If a collision has occured, trigger the "collision" event which the game logic
+        // module uses to cause the player to lose a life
+        if (collided) {
+            Frogger.observer.publish("collision");
+        }
+
+        return collided;
+    }
+
+    // Define a function to reset each of the rows to reset to their initial state
+    function reset() {
+        var row;
+
+        // Loop through each row calling its reset() method, which in turn calls the
+        // reset() method of each of the obstacles within that row
+        for (var index = 0, length = _rows.length; index < length; index++) {
+            row = _rows[index];
+            row.reset();
+        }
+    }
+
+    // When the game logic wishes the game board to reset, call the local reset() function
+    Frogger.observer.subscribe("reset", reset);
+
+    // When the game loop wishes to check for collisions, call the local isCollision()
+    // function, which will fire a "collision" event if a collision occurs
+    Frogger.observer.subscribe("check-collisions", isCollision);
+
+    // When the game board has initialized its properties and settings, call the local
+    // initialize() function to place the rows and obstacles onto the game board
+    Frogger.observer.subscribe("game-board-initialize", initialize);
+}(Frogger));
+
+//After all code ran and module registered. Mulai game logic dan Jalankan gamenya.
+Frogger.observer.publish("game-load");
