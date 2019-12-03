@@ -36,7 +36,14 @@ img.show-text:hover + span
   position: relative
   animation-delay: 1s
   top: 50px
-
+.bespoke-active div:first-child h1.animate-text-in
+  animation: fadeInQuote
+  animation-duration: 1.5s
+  animation-direction: normal
+  animation-fill-mode: forwards
+  position: relative
+  animation-delay: 1s
+  top: 100px
 .animate-text-container
   width: 100%
   height: 60px
@@ -52,6 +59,15 @@ img.show-text:hover + span
   }
 }
 
+@keyframes fadeInQuote{
+  from{
+    top: 100px
+
+  }
+  to{
+    top: 0px
+  }
+}
 
 /* Membuat style untuk canvas dan game */
 
@@ -81,4 +97,4 @@ img.show-text:hover + span
   position: absolute;
   z-index: 0;
   opacity: 0;
-  transition: 2000ms all;
+  transition: 10000ms all;
